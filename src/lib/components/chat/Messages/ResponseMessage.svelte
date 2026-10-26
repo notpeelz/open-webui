@@ -635,7 +635,13 @@
 
 	const contentCopyHandler = (e: ClipboardEvent) => {
 		const selection = window.getSelection();
-		if (!contentContainerElement || !e.clipboardData || !selection || selection.rangeCount === 0) {
+		if (
+			!contentContainerElement ||
+			!e.clipboardData ||
+			!selection ||
+			selection.rangeCount === 0 ||
+			selection.isCollapsed
+		) {
 			return;
 		}
 
