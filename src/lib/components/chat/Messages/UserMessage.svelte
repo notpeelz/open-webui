@@ -15,6 +15,7 @@
 		formatMessageTimestampFull,
 		isRasterImageContentType
 	} from '$lib/utils';
+	import { getSelectionClipboardData } from '$lib/utils/clipboard';
 	import { WEBUI_API_BASE_URL, WEBUI_BASE_URL } from '$lib/constants';
 	import equal from 'fast-deep-equal';
 
@@ -94,6 +95,18 @@
 		if (res) {
 			toast.success($i18n.t('Copying to clipboard was successful!'));
 		}
+	};
+
+	const contentCopyHandler = (e: ClipboardEvent) => {
+		const selection = window.getSelection();
+		if (!e.clipboardData || !selection || selection.rangeCount === 0) {
+			return;
+		}
+
+		e.preventDefault();
+		const { html, text } = getSelectionClipboardData(selection);
+		e.clipboardData.setData('text/html', html);
+		e.clipboardData.setData('text/plain', text);
 	};
 
 	const editMessageHandler = async () => {
@@ -435,7 +448,7 @@
 						>
 							{#if message.content}
 								{#if $settings?.renderMarkdownInUserMessages ?? true}
-									<div class="markdown-prose">
+									<div class="markdown-prose" on:copy={contentCopyHandler}>
 										<Markdown
 											id={`${chatId}-${message.id}`}
 											content={message.content}
